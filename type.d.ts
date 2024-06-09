@@ -14,7 +14,7 @@ type TokenInfo = {
   isLST?: boolean;
 };
 
-type BasicCoin = "SUI" | "USDC" | "USDT" | "BUCK";
+type BasicCoin = "SUI" | "USDC" | "USDT" | "BUCK" | "EYES";
 
 type SuiObjectResponse = any;
 

@@ -24,6 +24,11 @@ export const TOKEN_LIST: {
     symbol: "USDT",
     iconPath: "/images/coins/usdt-light.png",
   },
+  EYES: {
+    token: "EYES",
+    symbol: "EYES",
+    iconPath: "images/coins/eyes-icon.png"
+  }
 };
 
 export const getTokenSymbol = (coin: BasicCoin) => {

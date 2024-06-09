@@ -3,13 +3,13 @@ import {
   useAccounts,
   useSignAndExecuteTransactionBlock,
   useSuiClient,
-  useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import { AppContext } from "@/context/AppContext";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
 import { toast } from "react-toastify";
 import { showToast } from "../ui/linkToast";
+import BasicInputField from "../fields/basicInputField";
 import { checkWalletConnection } from "../../lib/transactionUtils";
 import {
   Card,
@@ -67,13 +67,13 @@ const BasicContainer = () => {
   const PACKAGE_ID =
     //"0x98586ca18166609eb5445ed73643b5bae6cbdada8c5cbcd7e093ff4146db6bfa";
     //"0x6534800dd5386645739dc8ab4b0d4513d97be060e51c79d5f12f7674251e0e07";
-    //"0xd1d1f80291ce6017118d0ce521e19640b1118d592b740a32490ed8f4701adced";
-    "0xf4fb9b3ec99244bd263463817ea07b8d81a9e3edbbe9e09c7a335c566396aa3a";
+    "0xd1d1f80291ce6017118d0ce521e19640b1118d592b740a32490ed8f4701adced";
+    //"0xf4fb9b3ec99244bd263463817ea07b8d81a9e3edbbe9e09c7a335c566396aa3a";
   const TASK_MANAGER_ID =
     //"0xbd611efa720db9f59e49f0619b4bd03edfb6ad157cd85520f8caf341b98315c0";
     //"0xb3fc7d4e44ff88254069e2fe8401fee9b1c00cc66662ec204f935a8951b1d729";
-    //"0x7d4056af19b0ba1b6ea42e935b4301d310041e75109f262bfeef6f3a7a8e6ac9";
-    "0xd3433849493761a5a18730a97d93a60d5556f91f8e458cdad66d64473921ad09";
+    "0x7d4056af19b0ba1b6ea42e935b4301d310041e75109f262bfeef6f3a7a8e6ac9";
+    //"0xd3433849493761a5a18730a97d93a60d5556f91f8e458cdad66d64473921ad09";
 
   const FLOAT_SCALING = 1000000000;
   const DEVNET_EXPLORE = "https://suiscan.xyz/devnet/tx/";
@@ -82,11 +82,14 @@ const BasicContainer = () => {
   const {
     suiBalance,
     refetch,
-    allCoins,
+    allCoinBalances,
+    refetchAllCoinBalances,
     userTaskSheets,
     refetchUserTaskSheets,
     userModCaps,
-    refetchUserModCaps
+    refetchUserModCaps,
+    userAdminCaps,
+    refetchUserAdminCaps
   } = useSuiQueries();
   const jsonStrUserModCaps = JSON.stringify(userModCaps);
   const jsonStrUserTaskSheets = JSON.stringify(userTaskSheets, null, 2);
@@ -97,6 +100,7 @@ const BasicContainer = () => {
   const truncateAddress = (address: string | any[]) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
+  /*
   const userBalance = useMemo(() => {
     if (suiBalance?.totalBalance) {
       return Math.floor(Number(suiBalance?.totalBalance) / 10 ** 9);
@@ -104,6 +108,7 @@ const BasicContainer = () => {
       return 0;
     }
   }, [suiBalance]);
+  */
 
   const [newTask, setNewTask] = useState({
     reward_type: "",
@@ -119,6 +124,7 @@ const BasicContainer = () => {
     moderator: "",
     fund: "",
   });
+  const [inputValue, setInputValue] = useState('')
   const [selectedToken, setSelectedToken] = useState<string>("SUI");
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [acceptedTasks, setAcceptedTasks] = useState<Task[]>([]);
@@ -291,7 +297,7 @@ const BasicContainer = () => {
     }
   }
 
-  // Accept Task //FIXME: Here
+  // Accept Task
   const handleAcceptTask = async (selectedTask: Task) => {
     if (!account) {
       toast.error("Please connect your wallet");
@@ -643,71 +649,76 @@ const BasicContainer = () => {
     console.log(task);
   };
 
-  //增加獎池資金 | add_task_fund<T>;
-  const handleAddTaskFund = (selectedTaskID: string, fund: number) => {
-    /* if (!checkWalletConnection(account)) return;
+  //增加獎池資金 | add_task_fund<T>; //TODO: HERE add fund function
+  const handleAddTaskFund = (
+      selectedTaskID: string,
+      fund: number //TODO: later change to selelction from user wallet
+    ) => {
 
-        const txb = new TransactionBlock();
-        console.log(selectedTask);
-        txb.moveCall({
-          target: `${PACKAGE_ID}::public_task::add_task_fund`,
-          arguments: [
-            txb.object(
-              selectedTaskId
-            ),
-            txb.pure(SUI_CLOCK_OBJECT_ID),
-            txb.pure(fund),
-          ],
-          typeArguments: ["0x2::sui::SUI"],
-        });
+      if (!checkWalletConnection(account)) return;
+      console.log(allCoinBalances);
+    
 
-        txb.setSender(account.address);
-        const dryrunRes = await client.dryRunTransactionBlock({
-          transactionBlock: await txb.build({ client: client }),
-        });
-        console.log(dryrunRes);
+      const txb = new TransactionBlock();
+      //console.log(selectedTask);
+      /*
+      txb.moveCall({
+        target: `${PACKAGE_ID}::public_task::add_task_fund`,
+        arguments: [
+          txb.pure(selectedTaskID), //taskid
+          txb.pure(fund), //Fund object ID
+          txb.pure(admincap) //related admincap
+        ],
+        typeArguments: [cointype], //reward type
+      });
 
-        if (dryrunRes.effects.status.status === "success") {
-          signAndExecuteTransactionBlock(
-            {
-              transactionBlock: txb,
-              options: {
-                showEffects: true,
-              },
+      txb.setSender(account.address);
+      const dryrunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await txb.build({ client: client }),
+      });
+      console.log(dryrunRes);
+
+      if (dryrunRes.effects.status.status === "success") {
+        signAndExecuteTransactionBlock(
+          {
+            transactionBlock: txb,
+            options: {
+              showEffects: true,
             },
-            {
-              onSuccess: async (res) => {
-                try {
-                  const digest = await txb.getDigest({ client: client });
-                  showToast("Task Fund Added", explorerUrl);
-                  console.log(`Transaction Digest`, digest);
-                } catch (digestError) {
-                  if (digestError instanceof Error) {
-                    toast.error(
-                      `Transaction sent, but failed to get digest: ${digestError.message}`
-                    );
-                  } else {
-                    toast.error(
-                      "Transaction sent, but failed to get digest due to an unknown error."
-                    );
-                  }
+          },
+          {
+            onSuccess: async (res) => {
+              try {
+                const digest = await txb.getDigest({ client: client });
+                showToast("Task Fund Added", explorerUrl);
+                console.log(`Transaction Digest`, digest);
+              } catch (digestError) {
+                if (digestError instanceof Error) {
+                  toast.error(
+                    `Transaction sent, but failed to get digest: ${digestError.message}`
+                  );
+                } else {
+                  toast.error(
+                    "Transaction sent, but failed to get digest due to an unknown error."
+                  );
                 }
-                refetch();
-                fetchData();
-              },
-              onError: (err) => {
-                toast.error("Tx Failed!");
-                console.log(err);
-              },
-            }
-          );
-        } else {
-          toast.error("Something went wrong");
-        }*/
-    if (selectedTask) {
-      toast.success(`${selectedTaskID} ${"任務基金已增加"} ${fund} SUI`);
-      setSelectedTask(null);
-    }
+              }
+              refetch();
+              //fetchData();
+            },
+            onError: (err) => {
+              toast.error("Tx Failed!");
+              console.log(err);
+            },
+          }
+        );
+      } else {
+        toast.error("Something went wrong");
+      }
+      if (selectedTask) {
+        //toast.success(`${selectedTaskID} ${"Task Funding Increased"} ${fund}`);
+        setSelectedTask(null);
+      }*/
   };
   //取出獎池資金 | retrieve_task_fund<T>
   const handleTakeTaskFund = (selectedTaskID: string, fund: number) => {
@@ -1828,6 +1839,16 @@ const BasicContainer = () => {
                   Take Fund
                 </Button>
                 <p>Add Fund</p>
+                <BasicInputField //TODO: here
+                  label="Input"
+                  inputValue={inputValue}
+                  setInputValue={setInputValue}
+                  tokenInfo={["SUI", "BUCK", "USDC", "USDT", "EYES"]}
+                  canSelectToken={true}
+                  selectedToken={selectedToken}
+                  setSelectedToken={setSelectedToken}
+                  maxValue={0.0}
+                />
                 <Input
                   type="number"
                   label="Amount"

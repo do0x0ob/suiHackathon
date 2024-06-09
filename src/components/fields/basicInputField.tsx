@@ -85,7 +85,7 @@ const BasicInputField = ({
   }, [debouncedInputValue]);
 
   return (
-    <div className="w-full p-4 flex flex-col gap-2 rounded-2xl bg-white/10 bg-token-input-field-radial">
+    <div className="w-full p-4 flex flex-col rounded-2xl bg-white/5 bg-token-input-field-radial">
       {/* Label and wallet balance */}
       <div
         className={cn(
@@ -94,12 +94,12 @@ const BasicInputField = ({
         )}
       >
         {/* Label */}
-        <span className="text-sm text-white/50">{label}</span>
+        <span className="text-sm text-white/70">{label}</span>
         {/* Wallet Balance */}
         {subLabelContent}
       </div>
       {/* Control Panel */}
-      <div className="w-full flex flex-col gap-1">
+      <div className="w-full flex flex-col">
         {/* Input field and token */}
         <div
           className={cn(
@@ -111,7 +111,7 @@ const BasicInputField = ({
           <input
             type="text"
             inputMode="decimal"
-            className="w-full h-9 md:h-12 bg-transparent text-[28px] md:text-[40px] font-medium leading-normal -tracking-[0.28px] md:-tracking-[0.4px] text-white caret-white placeholder:text-white/50 focus:outline-none ring-0"
+            className="w-full h-6 md:h-8 bg-transparent text-[12px] md:text-[16px] font-medium leading-normal -tracking-[0.28px] md:-tracking-[0.4px] text-white/70 caret-white placeholder:text-white/70 focus:outline-none ring-0"
             placeholder={"0.00"}
             min="0"
             minLength={1}
@@ -144,10 +144,10 @@ const BasicInputField = ({
                       "/images/coins/USDC.png"
                     }
                     alt={selectedToken ?? "Token"}
-                    width={40}
-                    height={40}
+                    width={32}
+                    height={32}
                   />
-                  <span className="px-1 text-[28px] md:text-[40px] font-medium leading-normal -tracking-[0.28px] md:-tracking-[1.2px] text-white">
+                  <span className="px-1 text-[16px] md:text-[20px] font-medium leading-normal -tracking-[0.28px] md:-tracking-[1.2px] text-white">
                     {TOKEN_LIST[selectedToken as BasicCoin]?.symbol ?? "USDC"}
                   </span>
                 </SelectTrigger>
@@ -168,7 +168,7 @@ const BasicInputField = ({
               </Select>
             )
           ) : (
-            <div className="h-9 flex items-center gap-2 border-none !outline-none !ring-0 p-0 m-0 bg-transparent justify-end">
+            <div className="h-9 flex items-center border-none !outline-none !ring-0 p-0 m-0 bg-transparent justify-end">
               <Image
                 className="min-w-8 xl:min-w-10 aspect-square rounded-[50%]"
                 src={
