@@ -53,14 +53,7 @@ export const useSuiQueries = () => {
     // Get All SuiFren NFT object id from user wallet //FIXME: return undefined
     const { data: userSuifrens, refetch: refetchUserSuifrens } = useSuiClientQuery('getOwnedObjects', {
         owner: walletAddress ?? '',
-        filter: {
-            MoveModule: {
-                module: `${SUIFRENS_PACKAGE_ID}`,
-                package: `capy`,
-            }
-        },
         options:{
-            showDisplay: true,
             showContent: true
         }
     });

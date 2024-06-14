@@ -184,19 +184,18 @@ const BasicContainer = () => {
   // Get objects data for eash item in `publishedTaskIdsArr`
   async function fetchAllTaskList() {
     try {
-      console.log("userSuifrens:", userSuifrens);
+      console.log("userSuifrens(now all):", userSuifrens);//FIXME: testuse only
+      console.log("userModCaps:", userModCaps); //FIXME: testuse only
       const publishedTaskIdsArr = await fetchTaskList();
 
-      const multiGetObjectsParams = {
-        ids: publishedTaskIdsArr,
-        options: {
-          showContent: true,
-          showPreviousTransaction: true,
-        },
-      };
-
       const objectsResponse = await client.multiGetObjects(
-        multiGetObjectsParams,
+        {
+          ids: publishedTaskIdsArr,
+          options: {
+            showContent: true,
+            showPreviousTransaction: true,
+          },
+        }
       );
       return objectsResponse;
     } catch (error) {
@@ -502,7 +501,7 @@ const BasicContainer = () => {
   const getRelateTaskSheetAndCap = async (selectedTaskID: string) => {
 
     refetchUserTaskSheets();
-    //const jsonStrUserTaskSheets = JSON.stringify(userTaskSheets, null, 2);
+    
     const jsonObjUserTaskSheet = JSON.parse(jsonStrUserTaskSheets);
     const userTaskSheetArray = jsonObjUserTaskSheet.data;
 
@@ -1097,6 +1096,10 @@ const BasicContainer = () => {
   useEffect(() => {
     const fetchSuiFrenSvg = async () => {
       try {
+        // TODO: Get SuiFren Object id from userwallet
+
+
+
         //TODO: pass a constant while testing
         // const suifrenId = userSuifrens;
         const suifrenId = `0xfb572d4b05aa5de7d9d3a1352f72d0957aa3cb4c2f2ac8a548af98c105ddad3a`;
